@@ -60,13 +60,27 @@ class SchedulerAgent:
             schedule_df['discharge'] = opt_res['discharge']
             schedule_df['soc'] = opt_res['soc']
             schedule_df['grid_power'] = opt_res['grid_power']
+
+            pv_direct_use = np.minimum(schedule_df['load_kw'], schedule_df['pv_kw'])
+            pv_surplus = np.maximum(schedule_df['pv_kw'] - schedule_df['load_kw'], 0)
+            pv_to_battery = np.minimum(pv_surplus, schedule_df['charge'])
+            pv_utilized = pv_direct_use + pv_to_battery
+            pv_total = schedule_df['pv_kw'].sum()
+            pv_utilization_rate = float(pv_utilized.sum() / pv_total) if pv_total > 0 else 0.0
+            pv_curtailment = float(pv_total - pv_utilized.sum())
             
             result = {
                 "total_cost": opt_res['total_cost'],
                 "schedule": schedule_df,
                 "battery_power": opt_res['battery_power'],
                 "soc": opt_res['soc'],
-                "grid_power": opt_res['grid_power']
+                "grid_power": opt_res['grid_power'],
+                "pv_total_kwh": float(pv_total),
+                "pv_utilized_kwh": float(pv_utilized.sum()),
+                "pv_direct_use_kwh": float(pv_direct_use.sum()),
+                "pv_to_battery_kwh": float(pv_to_battery.sum()),
+                "pv_curtailment_kwh": pv_curtailment,
+                "pv_utilization_rate": pv_utilization_rate
             }
         
         # 4. 调用 reporter 输出自然语言解释

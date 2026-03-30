@@ -61,5 +61,12 @@ def generate_report(analysis, result, baseline_cost):
     report_lines.append(f"- **基线购电成本 (无储能)**: {baseline_cost:.2f} 元")
     report_lines.append(f"- **优化后购电成本**: {optimized_cost:.2f} 元")
     report_lines.append(f"- **预估节省金额**: {savings:.2f} 元 (降幅约 {savings_rate:.1f}%)")
+
+    report_lines.append("### 5. 光伏消纳情况")
+    report_lines.append(f"- **光伏总发电量**: {result['pv_total_kwh']:.2f} kWh")
+    report_lines.append(f"- **光伏直接供负荷**: {result['pv_direct_use_kwh']:.2f} kWh")
+    report_lines.append(f"- **光伏充电入储能**: {result['pv_to_battery_kwh']:.2f} kWh")
+    report_lines.append(f"- **光伏利用率**: {result['pv_utilization_rate'] * 100:.1f}%")
+    report_lines.append(f"- **弃光电量**: {result['pv_curtailment_kwh']:.2f} kWh")
     
     return "\n".join(report_lines)
