@@ -61,6 +61,11 @@ def main():
         ax1.legend(loc='upper right')
         ax1.grid(True, linestyle='--', alpha=0.6)
         
+        # 优化 ax1 Y 轴：确保包含所有数据点并留有余量
+        all_power_data = pd.concat([schedule['load_kw'], schedule['pv_kw'], schedule['grid_power'], schedule['battery_power']])
+        p_min, p_max = all_power_data.min(), all_power_data.max()
+        ax1.set_ylim(p_min - 10, p_max + 20)
+        
         # 子图 2: SOC 状态
         ax2.plot(schedule['hour'], schedule['soc'], label='SOC', color='purple', marker='o', linewidth=2)
         ax2_price = ax2.twinx()
@@ -70,6 +75,14 @@ def main():
         ax2.set_ylabel('SOC (State of Charge)')
         ax2_price.set_ylabel('Price (RMB/kWh)')
         ax2.set_title('Battery SOC and Electricity Price')
+        
+        # 优化 ax2 Y 轴：SOC (0.0-1.0) 和 Price (0.0-1.8)
+        ax2.set_ylim(0.0, 1.2)
+        ax2_price.set_ylim(0.0, 2.0)
+        
+        # 设置 X 轴范围为 0-24，并设置刻度
+        ax2.set_xlim(0, 24)
+        ax2.set_xticks(range(0, 25, 2))
         
         # 合并图例
         lines, labels = ax2.get_legend_handles_labels()
